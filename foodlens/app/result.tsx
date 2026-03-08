@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { calculateHealthScore } from "../utils/healthScore";
 
 export default function ResultScreen() {
   const router = useRouter();
@@ -22,6 +23,14 @@ export default function ResultScreen() {
         frequently.
       </Text>
 
+      <Text style={[styles.verdict,{color:score.color}]}>
+{score.rating}
+</Text>
+
+<Text style={styles.reason}>
+{score.message}
+</Text>
+
       <Pressable
         style={styles.backButton}
         onPress={() => router.replace("/")}
@@ -32,6 +41,7 @@ export default function ResultScreen() {
   );
 }
 
+const score = calculateHealthScore(data);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
