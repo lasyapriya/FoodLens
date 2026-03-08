@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
-import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { analyzeIngredients } from "../utils/analyzeIngredients";
+import { useEffect, useState } from "react";
 
 /* ---------- Types ---------- */
 type Ingredient = {
@@ -11,43 +12,22 @@ type Ingredient = {
   reason: string;
 };
 
-/* ---------- Dummy Data (UI-only) ---------- */
-const DUMMY_INGREDIENTS: Ingredient[] = [
-  {
-    name: "Sugar",
-    risk: "Caution",
-    reason:
-      "High sugar intake may increase the risk of diabetes, obesity, and tooth decay when consumed frequently.",
-  },
-  {
-    name: "Palm Oil",
-    risk: "Caution",
-    reason:
-      "Contains saturated fats which may negatively impact heart health if consumed in excess.",
-  },
-  {
-    name: "Monosodium Glutamate (MSG)",
-    risk: "Avoid",
-    reason:
-      "May cause headaches or allergic reactions in sensitive individuals when consumed in large amounts.",
-  },
-  {
-    name: "Wheat Flour",
-    risk: "Safe",
-    reason:
-      "Generally safe for most people, but unsuitable for individuals with gluten intolerance or celiac disease.",
-  },
-  {
-    name: "Salt",
-    risk: "Caution",
-    reason:
-      "Excess sodium intake may contribute to high blood pressure and cardiovascular issues.",
-  },
-];
-
 /* ---------- Screen ---------- */
 export default function IngredientsScreen() {
   const router = useRouter();
+
+  const { ingredients } = useLocalSearchParams();
+
+  const [data, setData] = useState<Ingredient[]>([]);
+
+  useEffect(() => {
+    const run = async () => {
+      const result = await analyzeIngredients(ingredients as string);
+      setData(result);
+    };
+
+    run();
+  }, []);
 
   return (
     <LinearGradient
@@ -60,7 +40,7 @@ export default function IngredientsScreen() {
       </Text>
 
       <ScrollView contentContainerStyle={styles.list}>
-        {DUMMY_INGREDIENTS.map((item, index) => (
+        {data.map((item, index) => (
           <IngredientCard key={index} ingredient={item} />
         ))}
       </ScrollView>
